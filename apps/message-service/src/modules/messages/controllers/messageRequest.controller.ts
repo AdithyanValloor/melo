@@ -4,8 +4,8 @@ import { Unauthorized } from "../../../errors/httpErrors.js";
 import { MessageReqParams } from "../types/message.types.js";
 import { messageRequestService } from "../composition/container.js";
 import {
-  publishMessagerequestAccepted,
-  publishMessagerequestRejected,
+  publishMessageRequestAccepted,
+  publishMessageRequestRejected,
 } from "../../../rabbitmq/publisher/message.publisher.js";
 import { createEvent } from "../../../rabbitmq/helpers/event.helper.js";
 
@@ -51,7 +51,7 @@ export const acceptMessageRequestController = async (
 
     const [userA, userB] = result.chat?.members as any[];
 
-    await publishMessagerequestAccepted(
+    await publishMessageRequestAccepted(
       createEvent("message-request.accepted", {
         userA: userA._id.toString(),
         userB: userB._id.toString(),
@@ -89,7 +89,7 @@ export const rejectMessageRequestController = async (
       userId,
     );
 
-    await publishMessagerequestRejected(
+    await publishMessageRequestRejected(
       createEvent("message-request.rejected", {
         fromUserId: result.request.from.toString(),
         chatId: result.chatId,

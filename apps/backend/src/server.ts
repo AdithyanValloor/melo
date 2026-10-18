@@ -29,7 +29,7 @@ export const startServer = async (): Promise<void> => {
 
     initSocket(server);
     
-    await startRabbitMQConsumers();
+    void startRabbitMQConsumers();
 
     startUserGrpcServer();
 

@@ -1,31 +1,32 @@
-import { getRabbitMQChannel } from "../connection.js";
+
+import type { Channel } from "amqplib";
 import { handleGroupEvent } from "../handlers/group.handler.js";
-import { setupRabbitMQTopology } from "../topology.js";
 
-
-export const startGroupRabbitMQConsumer = async () => {
-  const channel = await getRabbitMQChannel();
-
-  await setupRabbitMQTopology();
-
-  channel.prefetch(1);
+export const startGroupRabbitMQConsumer = async (
+  channel: Channel,
+): Promise<void> => {
+  await channel.prefetch(1);
 
   await channel.consume("backend.groups", async (message) => {
     if (!message) return;
 
-    try {
-      const event = JSON.parse(message.content.toString());
+    let event: unknown;
 
-      console.log("🐇 Received group RabbitMQ event:", event.eventType);
+    try {
+      event = JSON.parse(message.content.toString());
+
+      console.log("🐇 Received group RabbitMQ event");
 
       await handleGroupEvent(event);
 
-      channel.ack(message);
     } catch (error) {
       console.error("RabbitMQ group message processing failed:", error);
 
       channel.nack(message, false, false);
+      return;
     }
+
+    channel.ack(message);
   });
 
   console.log("🐇 Group RabbitMQ consumer started");

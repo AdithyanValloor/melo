@@ -12,8 +12,6 @@ import { extractFirstUrl } from "../utils/linkPreview.js";
 
 import { MessageFile, MessageRequestDTO } from "../types/message.types.js";
 
-// import * as NotificationAPI from "../../notifications/api/notifications.api.js";
-
 import * as ChatAPI from "../../chat/api/chat.api.js";
 import { incrementUnreadCount } from "../cache/messages.cache.js";
 import { IMessageRepository } from "../repositories/message.repository.js";
@@ -26,7 +24,7 @@ import {
 import { blockExists } from "../../../grpc/social/social.grpc.client.js";
 
 import { publishMediaDeleteFile } from "../../../rabbitmq/publisher/media.publisher.js";
-import { publishMessagerequestCreated } from "../../../rabbitmq/publisher/message.publisher.js";
+import { publishMessageRequestCreated } from "../../../rabbitmq/publisher/message.publisher.js";
 import { createEvent } from "../../../rabbitmq/helpers/event.helper.js";
 import {
   publishNotificationNotifyMention,
@@ -266,18 +264,6 @@ export class MessageService {
     // Update latest message
     await ChatAPI.updateLastMessage(chatId, message._id.toString());
 
-    console.log("========== MESSAGE REQUEST DEBUG ==========");
-    console.log("chatId:", chatId);
-    console.log("senderId:", senderId);
-    console.log("isGroup:", chat.isGroup);
-    console.log("requestPending:", chat.requestPending);
-    console.log("requestInitiator:", chat.requestInitiator?.toString());
-    console.log(
-      "initiator matches sender:",
-      chat.requestInitiator?.toString() === senderId,
-    );
-    console.log("===========================================");
-
     // Message request
     if (
       !chat.isGroup &&
@@ -319,7 +305,7 @@ export class MessageService {
             to: toUser,
           };
 
-          await publishMessagerequestCreated(
+          await publishMessageRequestCreated(
             createEvent("message-request.created", {
               senderId,
               toUserId,

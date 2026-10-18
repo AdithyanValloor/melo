@@ -1,16 +1,28 @@
-import { getRabbitMQChannel } from "./connection.js";
+import type { Channel } from "amqplib";
 
-export const setupRabbitMQTopology = async () => {
-  const channel = await getRabbitMQChannel();
-
-  // Exchange
+export const setupRabbitMQTopology = async (
+  channel: Channel,
+): Promise<void> => {
+  // Main event exchange
   await channel.assertExchange("message.events", "direct", {
+    durable: true,
+  });
+
+  // Retry and dead-letter exchanges
+  await channel.assertExchange("message.retry", "direct", {
+    durable: true,
+  });
+
+  await channel.assertExchange("message.dlx", "direct", {
     durable: true,
   });
 
   // Message events queue
   await channel.assertQueue("backend.messages", {
     durable: true,
+    arguments: {
+      "x-dead-letter-exchange": "message.retry",
+    },
   });
 
   const messageEvents = [
@@ -21,8 +33,6 @@ export const setupRabbitMQTopology = async () => {
     "message.reaction",
     "message.delete",
     "message.seen",
-
-    // Message request events
     "message-request.created",
     "message-request.accepted",
     "message-request.rejected",
@@ -30,6 +40,33 @@ export const setupRabbitMQTopology = async () => {
 
   for (const routingKey of messageEvents) {
     await channel.bindQueue("backend.messages", "message.events", routingKey);
+  }
+
+  // Failed messages wait here for 5 seconds,
+  // then return to the main event exchange.
+  await channel.assertQueue("backend.messages.retry", {
+    durable: true,
+    arguments: {
+      "x-message-ttl": 5000,
+      "x-dead-letter-exchange": "message.events",
+    },
+  });
+
+  for (const routingKey of messageEvents) {
+    await channel.bindQueue(
+      "backend.messages.retry",
+      "message.retry",
+      routingKey,
+    );
+  }
+
+  // Permanently failed messages are retained for inspection.
+  await channel.assertQueue("backend.messages.dlq", {
+    durable: true,
+  });
+
+  for (const routingKey of messageEvents) {
+    await channel.bindQueue("backend.messages.dlq", "message.dlx", routingKey);
   }
 
   // Group events queue

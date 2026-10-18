@@ -1,22 +1,42 @@
-import amqp, { Channel, ChannelModel } from "amqplib";
+import amqp, {
+  type Channel,
+  type ChannelModel,
+  type ConfirmChannel,
+} from "amqplib";
 
 const RABBITMQ_URL =
-  process.env.RABBITMQ_URL ??
-  "amqp://guest:guest@localhost:5672";
+  process.env.RABBITMQ_URL ?? "amqp://guest:guest@localhost:5672";
 
-let connection: ChannelModel | null = null;
-let channel: Channel | null = null;
+export interface RabbitMQSession {
+  connection: ChannelModel;
+  channel: Channel;
+  confirmChannel: ConfirmChannel;
+}
 
-export const getRabbitMQChannel = async (): Promise<Channel> => {
-  if (channel) {
-    return channel;
+export const connectRabbitMQ = async (): Promise<RabbitMQSession> => {
+  const connection = await amqp.connect(RABBITMQ_URL);
+
+  connection.on("error", (error) => {
+    console.error("RabbitMQ connection error:", error);
+  });
+
+  try {
+    const channel = await connection.createChannel();
+    const confirmChannel = await connection.createConfirmChannel();
+
+    channel.on("error", (error) => {
+      console.error("RabbitMQ consumer channel error:", error);
+    });
+
+    confirmChannel.on("error", (error) => {
+      console.error("RabbitMQ publisher channel error:", error);
+    });
+
+    console.log("🐇 RabbitMQ connected");
+
+    return { connection, channel, confirmChannel };
+  } catch (error) {
+    await connection.close().catch(() => undefined);
+    throw error;
   }
-
-  connection = await amqp.connect(RABBITMQ_URL);
-
-  channel = await connection.createChannel();
-
-  console.log("🐇 RabbitMQ connected");
-
-  return channel;
 };

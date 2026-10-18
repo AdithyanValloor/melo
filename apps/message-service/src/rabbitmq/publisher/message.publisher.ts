@@ -68,7 +68,7 @@ export const publishMessageDelete = async (
   console.log("✅ RabbitMQ confirmed message.delete");
 };
 
-export const publishMessagerequestAccepted = async (
+export const publishMessageRequestAccepted = async (
   event: MessageRequestAcceptedEvent,
 ): Promise<void> => {
   await publishEvent("message-request.accepted", event);
@@ -76,7 +76,7 @@ export const publishMessagerequestAccepted = async (
   console.log("✅ RabbitMQ confirmed message-request.accepted");
 };
 
-export const publishMessagerequestRejected = async (
+export const publishMessageRequestRejected = async (
   event: MessageRequestRejectedEvent,
 ): Promise<void> => {
   await publishEvent("message-request.rejected", event);
@@ -84,7 +84,7 @@ export const publishMessagerequestRejected = async (
   console.log("✅ RabbitMQ confirmed message-request.rejected");
 };
 
-export const publishMessagerequestCreated = async (
+export const publishMessageRequestCreated = async (
   event: MessageRequestCreatedEvent,
 ): Promise<void> => {
   await publishEvent("message-request.created", event);

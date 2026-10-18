@@ -9,8 +9,8 @@ import {
 import { messageRequestService } from "../../../src/modules/messages/composition/container.js";
 
 import {
-  publishMessagerequestAccepted,
-  publishMessagerequestRejected,
+  publishMessageRequestAccepted,
+  publishMessageRequestRejected,
 } from "../../../src/rabbitmq/publisher/message.publisher.js";
 
 import { createEvent } from "../../../src/rabbitmq/helpers/event.helper.js";
@@ -255,7 +255,7 @@ describe("acceptMessageRequestController()", () => {
       }),
     );
 
-    expect(publishMessagerequestAccepted).toHaveBeenCalledTimes(1);
+    expect(publishMessageRequestAccepted).toHaveBeenCalledTimes(1);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
@@ -283,7 +283,7 @@ describe("acceptMessageRequestController()", () => {
     await acceptMessageRequestController(req, res, next);
 
     expect(next).toHaveBeenCalledWith(error);
-    expect(publishMessagerequestAccepted).not.toHaveBeenCalled();
+    expect(publishMessageRequestAccepted).not.toHaveBeenCalled();
   });
 });
 
@@ -354,7 +354,7 @@ describe("rejectMessageRequestController()", () => {
       }),
     );
 
-    expect(publishMessagerequestRejected).toHaveBeenCalledTimes(1);
+    expect(publishMessageRequestRejected).toHaveBeenCalledTimes(1);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
@@ -382,6 +382,6 @@ describe("rejectMessageRequestController()", () => {
     await rejectMessageRequestController(req, res, next);
 
     expect(next).toHaveBeenCalledWith(error);
-    expect(publishMessagerequestRejected).not.toHaveBeenCalled();
+    expect(publishMessageRequestRejected).not.toHaveBeenCalled();
   });
 });

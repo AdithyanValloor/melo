@@ -14,7 +14,7 @@ import {
 } from "../../../src/grpc/user/user.grpc.client.js";
 import { blockExists } from "../../../src/grpc/social/social.grpc.client.js";
 import { publishMediaDeleteFile } from "../../../src/rabbitmq/publisher/media.publisher.js";
-import { publishMessagerequestCreated } from "../../../src/rabbitmq/publisher/message.publisher.js";
+import { publishMessageRequestCreated } from "../../../src/rabbitmq/publisher/message.publisher.js";
 import { createEvent } from "../../../src/rabbitmq/helpers/event.helper.js";
 import {
   publishNotificationNotifyMention,
@@ -242,7 +242,7 @@ beforeEach(() => {
   vi.mocked(blockExists).mockResolvedValue(null as any);
 
   vi.mocked(publishMediaDeleteFile).mockResolvedValue(undefined);
-  vi.mocked(publishMessagerequestCreated).mockResolvedValue(undefined);
+  vi.mocked(publishMessageRequestCreated).mockResolvedValue(undefined);
   vi.mocked(publishNotificationNotifyMention).mockResolvedValue(undefined);
   vi.mocked(publishNotificationNotifyReply).mockResolvedValue(undefined);
   vi.mocked(createEvent).mockImplementation(
@@ -498,7 +498,7 @@ describe("sendMessageFunction()", () => {
       to: otherUserId,
       firstMessage: "hello",
     });
-    expect(publishMessagerequestCreated).toHaveBeenCalledTimes(1);
+    expect(publishMessageRequestCreated).toHaveBeenCalledTimes(1);
   });
 });
 

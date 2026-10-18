@@ -1,17 +1,15 @@
+
+import type { Channel } from "amqplib";
 import {
   notifyMention,
   notifyReply,
   notifyGroupAdded,
 } from "../../services/notifications/api/notifications.api.js";
-import { getRabbitMQChannel } from "../connection.js";
-import { setupRabbitMQTopology } from "../topology.js";
 
-export const startNotificationRabbitMQConsumer = async () => {
-  const channel = await getRabbitMQChannel();
-
-  await setupRabbitMQTopology();
-
-  channel.prefetch(1);
+export const startNotificationRabbitMQConsumer = async (
+  channel: Channel,
+): Promise<void> => {
+  await channel.prefetch(1);
 
   await channel.consume("backend.notifications", async (message) => {
     if (!message) return;
@@ -51,13 +49,17 @@ export const startNotificationRabbitMQConsumer = async () => {
         default:
           console.warn(`Unknown notification event: ${event.eventType}`);
       }
-
-      channel.ack(message);
     } catch (error) {
-      console.error("Notification RabbitMQ message processing failed:", error);
+      console.error(
+        "Notification RabbitMQ message processing failed:",
+        error,
+      );
 
       channel.nack(message, false, false);
+      return;
     }
+
+    channel.ack(message);
   });
 
   console.log("🐇 Notification RabbitMQ consumer started");

@@ -41,6 +41,7 @@
     "@types/node": "^24.13.3",
     "@types/nodemailer": "^6.4.23",
     "@types/pg": "^8.21.0",
+    "@vitest/coverage-v8": "^4.1.11",
     "drizzle-kit": "^0.31.10",
     "pino-pretty": "^13.2.0",
     "ts-node": "^10.9.2",
