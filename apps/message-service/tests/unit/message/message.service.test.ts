@@ -60,7 +60,7 @@ vi.mock("../../../src/rabbitmq/publisher/media.publisher.js", () => ({
 }));
 
 vi.mock("../../../src/rabbitmq/publisher/message.publisher.js", () => ({
-  publishMessagerequestCreated: vi.fn(),
+  publishMessageRequestCreated: vi.fn(),
 }));
 
 vi.mock("../../../src/rabbitmq/helpers/event.helper.js", () => ({

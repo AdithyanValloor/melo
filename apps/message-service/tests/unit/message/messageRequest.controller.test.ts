@@ -28,8 +28,8 @@ vi.mock("../../../src/modules/messages/composition/container.js", () => ({
 }));
 
 vi.mock("../../../src/rabbitmq/publisher/message.publisher.js", () => ({
-  publishMessagerequestAccepted: vi.fn(),
-  publishMessagerequestRejected: vi.fn(),
+  publishMessageRequestAccepted: vi.fn(),
+  publishMessageRequestRejected: vi.fn(),
 }));
 
 vi.mock("../../../src/rabbitmq/helpers/event.helper.js", () => ({
